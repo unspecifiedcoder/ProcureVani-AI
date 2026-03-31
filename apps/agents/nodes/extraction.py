@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 
 CATEGORIES_PATH = Path(__file__).resolve().parents[3] / "data" / "gem_categories.json"
@@ -58,7 +58,7 @@ def _extract(pattern: str, text: str) -> str:
     return match.group(1) if match else ""
 
 
-def _extract_number(pattern: str, text: str) -> float | None:
+def _extract_number(pattern: str, text: str) -> Optional[float]:
     match = re.search(pattern, text)
     return float(match.group(1)) if match else None
 

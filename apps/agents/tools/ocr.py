@@ -11,7 +11,7 @@ async def extract_from_image(image_bytes: bytes) -> dict[str, Any]:
     joined = " ".join(lines)
     fields = {
         "invoice_no": _extract(r"invoice\s*(?:no|number)?[:#\- ]+([A-Z0-9\-/]+)", joined),
-        "supplier": _extract(r"supplier[:\- ]+([A-Za-z0-9 &.,-]+)", joined),
+        "supplier": _extract(r"supplier[:\- ]+(.+?)(?:\s+gstin[:\- ]+|\s+invoice\s|\s+amount[:\- ]+|$)", joined),
         "gstin": _extract(r"gstin[:\- ]+([0-9A-Z]{15})", joined),
         "amount": _extract(r"(?:amount|total)[:\- ]+([0-9,]+(?:\.[0-9]{1,2})?)", joined),
     }
