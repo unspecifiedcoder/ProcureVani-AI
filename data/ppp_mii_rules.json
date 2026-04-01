@@ -1,0 +1,22 @@
+{
+  "8539": {
+    "category": "LED Lamps",
+    "threshold": 50,
+    "policy_reference": "PPP-MII lighting notification"
+  },
+  "8471": {
+    "category": "Computers and processing units",
+    "threshold": 45,
+    "policy_reference": "MeitY electronics procurement order"
+  },
+  "5208": {
+    "category": "Cotton fabric",
+    "threshold": 75,
+    "policy_reference": "Textiles local sourcing guideline"
+  },
+  "8704": {
+    "category": "Motor vehicle parts",
+    "threshold": 50,
+    "policy_reference": "Automotive component sourcing policy"
+  }
+}

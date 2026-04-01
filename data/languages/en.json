@@ -1,0 +1,11 @@
+{
+  "welcome": "Welcome to ProcureVani!",
+  "help_text": "ProcureVani helps MSMEs validate PPP-MII compliance, issue compliance passports, and prepare GeM-ready submissions. Send 'register' to begin or 'status' to verify an existing passport.",
+  "compliant": "Congratulations! Your product meets the PPP-MII requirement.",
+  "non_compliant": "Your product is currently below the required PPP-MII threshold by {gap:.1f}%.",
+  "need_company_name": "Please share your company name.",
+  "need_product_name": "What product would you like to register?",
+  "need_hs_code": "Please provide the HS code for the product.",
+  "need_local_content": "Please tell me the local content percentage.",
+  "need_followup": "I still need a few more details before I can issue a passport."
+}

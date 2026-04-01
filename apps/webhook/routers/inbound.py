@@ -17,6 +17,7 @@ from apps.webhook.config import get_settings
 from apps.webhook.session import session_manager
 from apps.webhook.whatsapp import whatsapp_client
 from apps.agents.llm import gemini_llm
+from apps.agents.nodes.extraction import extract_registration_fields
 from apps.agents.tools.ppp_mii import check_compliance, calculate_lcv
 from apps.agents.tools.stt import transcribe_audio
 from apps.agents.tools.ocr import extract_from_image
@@ -245,13 +246,15 @@ async def _handle_welcome(
     intent = intent_result.get("intent", "other")
 
     if intent == "register" or any(kw in user_lower for kw in ["register", "new", "start", "hi", "hello", "namaste"]):
+        extracted = extract_registration_fields(user_input)
+        _merge_extracted_fields(session, extracted)
         session["step"] = "collect_company_name"
         welcome_msg = strings.get("welcome", "Welcome to ProcureVani!")
         return (
             f"{welcome_msg}\n\n"
             "I will help you check PPP-MII compliance and generate a Compliance Passport "
             "for GeM procurement.\n\n"
-            "Let us start. What is your company name?"
+            f"Let us start. {_next_missing_prompt(session, strings)}"
         )
 
     if intent == "check_status":
@@ -308,13 +311,17 @@ async def _handle_collection(user_input: str, session: Dict, strings: Dict) -> s
     else:
         session[field_name] = user_input.strip()
 
+    if field_name in {"product_name", "hs_code", "local_content_pct"}:
+        _merge_extracted_fields(session, extract_registration_fields(user_input))
+
     # Advance to the next field.
     next_index = field_index + 1
 
     if next_index < len(REGISTRATION_STEPS):
-        next_field_name, prompt_en, prompt_short = REGISTRATION_STEPS[next_index]
-        session["step"] = f"collect_{next_field_name}"
-        return prompt_en
+        next_field_name = _next_missing_field(session, start_index=next_index)
+        if next_field_name:
+            session["step"] = f"collect_{next_field_name}"
+            return _prompt_for_field(next_field_name, strings)
 
     # All fields collected. Run compliance check.
     return await _run_compliance(session, strings)
@@ -501,3 +508,39 @@ async def _handle_post_compliance(
     # General question -- use LLM.
     reply = await gemini_llm.generate_reply(user_input, session, session.get("language", "en"))
     return reply
+
+
+def _merge_extracted_fields(session: Dict[str, Any], extracted: Dict[str, Any]) -> None:
+    for field in ("product_name", "hs_code", "local_content_pct", "gem_category"):
+        if not session.get(field) and extracted.get(field) not in (None, ""):
+            session[field] = extracted[field]
+
+
+def _next_missing_field(session: Dict[str, Any], start_index: int = 0) -> Optional[str]:
+    for field_name, _, _ in REGISTRATION_STEPS[start_index:]:
+        if session.get(field_name) in (None, ""):
+            return field_name
+    return None
+
+
+def _next_missing_prompt(session: Dict[str, Any], strings: Dict[str, str]) -> str:
+    field_name = _next_missing_field(session)
+    if not field_name:
+        return strings.get("need_followup", "I still need a few more details before I can issue a passport.")
+    return _prompt_for_field(field_name, strings)
+
+
+def _prompt_for_field(field_name: str, strings: Dict[str, str]) -> str:
+    prompt_map = {
+        "company_name": strings.get("need_company_name", "Please tell me your company name."),
+        "product_name": strings.get("need_product_name", "Which product do you want to register for compliance?"),
+        "hs_code": strings.get("need_hs_code", "What is the HS Code for this product?"),
+        "local_content_pct": strings.get("need_local_content", "What is the local content percentage of your product?"),
+    }
+    if field_name in prompt_map:
+        return prompt_map[field_name]
+
+    for step_field, prompt_en, _ in REGISTRATION_STEPS:
+        if step_field == field_name:
+            return prompt_en
+    return "Please share the next required detail."

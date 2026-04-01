@@ -1,0 +1,11 @@
+{
+  "welcome": "ProcureVani mein aapka swagat hai!",
+  "help_text": "ProcureVani MSME ko PPP-MII compliance check karne, compliance passport generate karne, aur GeM ke liye submission ready karne mein madad karta hai. Shuru karne ke liye 'register' bhejiye ya purane passport ko verify karne ke liye 'status' bhejiye.",
+  "compliant": "Badhai ho! Aapka product PPP-MII requirement ko meet karta hai.",
+  "non_compliant": "Aapka product abhi required PPP-MII threshold se {gap:.1f}% neeche hai.",
+  "need_company_name": "Kripya apni company ka naam batayein.",
+  "need_product_name": "Aap kaunsa product register karna chahte hain?",
+  "need_hs_code": "Kripya product ka HS code batayein.",
+  "need_local_content": "Kripya local content percentage batayein.",
+  "need_followup": "Passport issue karne se pehle mujhe kuch aur details chahiye."
+}

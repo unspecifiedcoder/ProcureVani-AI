@@ -1,0 +1,22 @@
+[
+  {
+    "keywords": ["led lamp", "lamp", "bulb", "lighting"],
+    "hs_code": "8539",
+    "gem_category": "LED Lighting Systems"
+  },
+  {
+    "keywords": ["computer", "desktop", "laptop", "server"],
+    "hs_code": "8471",
+    "gem_category": "Computer Hardware"
+  },
+  {
+    "keywords": ["cotton fabric", "fabric", "textile", "cloth"],
+    "hs_code": "5208",
+    "gem_category": "Textiles and Apparel"
+  },
+  {
+    "keywords": ["motor vehicle part", "axle", "brake", "autopart"],
+    "hs_code": "8704",
+    "gem_category": "Automotive Components"
+  }
+]
