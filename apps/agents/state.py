@@ -19,6 +19,11 @@ class MSMEState(TypedDict, total=False):
     raw_material_value: float
     foreign_input_value: float
     compliance_result: Dict[str, Any]
+    compliance_summary: str
+    compliance_guidance: str
+    threshold: float
+    compliance_gap: float
+    buyer_class: str
     passport_id: str
     doc_hash: str
     ipfs_hash: str
