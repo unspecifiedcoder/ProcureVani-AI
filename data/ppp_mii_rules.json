@@ -2,21 +2,43 @@
   "8539": {
     "category": "LED Lamps",
     "threshold": 50,
-    "policy_reference": "PPP-MII lighting notification"
+    "policy_reference": "PPP-MII lighting notification",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["BOM statement", "supplier invoice", "self declaration"]
   },
   "8471": {
     "category": "Computers and processing units",
     "threshold": 45,
-    "policy_reference": "MeitY electronics procurement order"
+    "policy_reference": "MeitY electronics procurement order",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["BOM statement", "import ledger", "cost sheet"]
   },
   "5208": {
     "category": "Cotton fabric",
     "threshold": 75,
-    "policy_reference": "Textiles local sourcing guideline"
+    "policy_reference": "Textiles local sourcing guideline",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["loom register", "yarn invoice", "GST invoice"]
   },
   "8704": {
     "category": "Motor vehicle parts",
     "threshold": 50,
-    "policy_reference": "Automotive component sourcing policy"
+    "policy_reference": "Automotive component sourcing policy",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["vendor invoice", "assembly sheet", "GST invoice"]
+  },
+  "9403": {
+    "category": "Furniture and fixtures",
+    "threshold": 60,
+    "policy_reference": "Government furniture procurement preference order",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["wood purchase bill", "factory register", "GST invoice"]
+  },
+  "3004": {
+    "category": "Formulated pharmaceutical products",
+    "threshold": 70,
+    "policy_reference": "Pharma public procurement preference order",
+    "buyer_class": "Class I Local Supplier",
+    "min_documents": ["batch record", "API source invoice", "GST invoice"]
   }
 }
