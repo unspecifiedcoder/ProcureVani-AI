@@ -27,10 +27,23 @@ def calculate_lcv(total_value: float, foreign_input_value: float) -> float:
     return round(((total_value - foreign_input_value) / total_value) * 100, 2)
 
 
-def check_compliance(hs_code: str, lcv_pct: float) -> Dict[str, Any]:
+def get_rule(hs_code: str) -> Dict[str, Any]:
     prefix = get_hs_code_prefix(hs_code)
     rule = PPP_MII_RULES.get(prefix, {})
-    threshold = float(rule.get("threshold", rule.get("min_lcv_percent", DEFAULT_THRESHOLD)))
+    return {
+        "prefix": prefix,
+        "category": rule.get("category", rule.get("product_category", "Unknown")),
+        "threshold": float(rule.get("threshold", rule.get("min_lcv_percent", DEFAULT_THRESHOLD))),
+        "policy_reference": rule.get("policy_reference", "Default threshold"),
+        "buyer_class": rule.get("buyer_class", "Class I Local Supplier"),
+        "min_documents": rule.get("min_documents", []),
+    }
+
+
+def check_compliance(hs_code: str, lcv_pct: float) -> Dict[str, Any]:
+    rule = get_rule(hs_code)
+    prefix = rule["prefix"]
+    threshold = rule["threshold"]
     gap = max(0.0, round(threshold - lcv_pct, 2))
     compliant = lcv_pct >= threshold
 
@@ -47,6 +60,9 @@ def check_compliance(hs_code: str, lcv_pct: float) -> Dict[str, Any]:
         "threshold": threshold,
         "gap": gap,
         "rating": rating,
-        "category": rule.get("category", rule.get("product_category", "Unknown")),
-        "policy_reference": rule.get("policy_reference", "Default threshold"),
+        "category": rule["category"],
+        "policy_reference": rule["policy_reference"],
+        "buyer_class": rule["buyer_class"],
+        "min_documents": rule["min_documents"],
+        "hs_code_prefix": prefix,
     }
