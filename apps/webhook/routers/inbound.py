@@ -18,6 +18,12 @@ from apps.webhook.session import session_manager
 from apps.webhook.whatsapp import whatsapp_client
 from apps.agents.llm import gemini_llm
 from apps.agents.nodes.extraction import extract_registration_fields
+from apps.agents.tools.compliance_messages import (
+    format_compliance_summary,
+    format_document_guidance,
+    format_gap_guidance,
+    rating_tone,
+)
 from apps.agents.tools.ppp_mii import check_compliance, calculate_lcv
 from apps.agents.tools.stt import transcribe_audio
 from apps.agents.tools.ocr import extract_from_image
@@ -350,6 +356,16 @@ async def _run_compliance(session: Dict, strings: Dict) -> str:
 
     result = check_compliance(hs_code, actual_lcv)
     session["compliance_result"] = result
+    summary = format_compliance_summary(result, session.get("product_name", "N/A"), strings)
+    tone = strings.get(rating_tone(result["rating"]), result["rating"])
+    document_guidance = format_document_guidance(result, strings)
+    gap_guidance = format_gap_guidance(result, strings)
+    compliance_guidance = "\n".join(part for part in [tone, document_guidance, gap_guidance] if part)
+    session["compliance_summary"] = summary
+    session["compliance_guidance"] = compliance_guidance
+    session["threshold"] = result["threshold"]
+    session["compliance_gap"] = result["gap"]
+    session["buyer_class"] = result.get("buyer_class", "Class I Local Supplier")
 
     if not result["compliant"]:
         session["step"] = "compliance_fail"
@@ -357,13 +373,11 @@ async def _run_compliance(session: Dict, strings: Dict) -> str:
         non_compliant_msg = strings.get("non_compliant", "Your product does not meet the PPP-MII threshold.").format(gap=gap)
         return (
             f"{non_compliant_msg}\n\n"
-            f"Product: {session.get('product_name', 'N/A')}\n"
+            f"{summary}\n"
             f"HS Code: {hs_code} ({result.get('category', 'Unknown')})\n"
-            f"Your LCV: {actual_lcv:.1f}%\n"
-            f"Required threshold: {result['threshold']}%\n"
-            f"Gap: {gap:.1f}%\n"
-            f"Rating: {result['rating']}\n\n"
-            "You need to increase local content by reducing foreign inputs. "
+            f"Buyer Class: {result.get('buyer_class', 'Class I Local Supplier')}\n"
+            f"Policy: {result.get('policy_reference', 'Default threshold')}\n\n"
+            f"{compliance_guidance}\n\n"
             "Send 'register' to try again with updated values."
         )
 
@@ -429,6 +443,8 @@ async def _run_compliance(session: Dict, strings: Dict) -> str:
 
     return (
         f"{compliant_msg}\n\n"
+        f"{summary}\n"
+        f"{compliance_guidance}\n\n"
         f"Compliance Passport Issued!\n"
         f"---\n"
         f"Passport ID: {passport_id}\n"
@@ -437,6 +453,7 @@ async def _run_compliance(session: Dict, strings: Dict) -> str:
         f"HS Code: {hs_code} ({result.get('category', 'Unknown')})\n"
         f"LCV Score: {actual_lcv:.1f}% (Threshold: {result['threshold']}%)\n"
         f"Rating: {result['rating']}\n"
+        f"Buyer Class: {result.get('buyer_class', 'Class I Local Supplier')}\n"
         f"Valid until: {valid_until}\n"
         f"Blockchain TX: {tx_hash}\n"
         f"---\n"
